@@ -1,0 +1,206 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Res Novae Pilot</title>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .center_text {
+      margin: 0;
+      padding: 2rem;
+      background-color: #0071c5;
+      color: #f4f4f4;
+      text-align: center;
+    }
+
+    .logo {
+      background-color: #0071c5;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .logo h1 {
+      color: #ddd;
+      margin: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    header {
+      background: #0071c5;
+      color: white;
+      padding: 0;
+      margin: 0;
+      position: fixed;
+      text-align: center;
+      width: 100%
+    }
+
+    main {
+      padding: 1rem;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: #0071c5;
+    }
+
+    section {
+      margin-bottom: 2rem;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    ul li {
+      background: #f4f4f4;
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+
+    .btn {
+      border: none;
+      background-color: inherit;
+      padding: 14px 28px;
+      font-size: 16px;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      background: #003a5c;
+    }
+
+    .default {
+      color: white;
+    }
+
+    footer {
+      background: #f4f4f4;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    footer a {
+      color: #0071c5;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+
+<body>
+  <header>
+    <a href="#logo"><button class="btn default">Home</button></a>
+    <a href="#AboutUs"><button class="btn default">About Us</button></a>
+    <a href="#mission_control"><button class="btn default">Mission Control</button></a>
+  </header>
+  <div id="logo" class="logo"><img src="https://i.imgur.com/PTuYcb5.png" alt="RES NOVAE" width=700 height=700></img>
+  </div>
+  <main>
+    <div id="AboutUs">
+      <section class="overview">
+        <h2>Overview</h2>
+        <p>Solid rocket fuels are key for rocket propulsion. Understanding how fuel variations affect thrust, total
+          impulse. burning efficiency, and stability is crucial for optimal rocket performance </p>
+      </section>
+      <section class="features">
+        <h2>Problem Statement</h2>
+        <ul>
+          <li>Regulated experimentation by testing varying propellant compositions</li>
+          <li>Designing a test stand and rocket motor for the above mentioned experiment.</li>
+          <li>Developing a localized website to get live telemetry of the experiment. Also designing an algorithm to
+            ease designing of solid rockets.</li>
+          <li>Computing delivered specific impulse of the different fuels by using the plotted thrust curves.</li>
+        </ul>
+      </section>
+      <section class="benefits">
+        <h2>Methodology</h2>
+        <p>We will form the grains by melt-casting the fuel.
+          We plan to fire the motor from a distance of over 80m wirelessly.
+          The motor will be ignited by electric matches.
+          We will obtain the load by the motor with which we can determine the burn time, thrust, impulse and delivered
+          specific impulse.
+          These will be graphed and compared.
+          The location of this test is RVCE ground and a previous test has already worked with no complications.
+        </p>
+      </section>
+    </div>
+  </main>
+  <div id="mission_control">
+    <br>
+    <h1 class=" center_text">Live Thrust Curve Telemetry</h1><br>
+    <div id="chart" class="container"></div>
+  </div>
+  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+</body>
+
+
+<script>
+  var chartT = new Highcharts.Chart({
+    chart: { renderTo: 'chart' },
+    title: { text: '' },
+    series: [{
+      showInLegend: false,
+      data: []
+    }],
+    plotOptions: {
+      line: {
+        animation: false,
+        dataLabels: { enabled: true }
+      },
+      series: { color: '#059e8a' }
+    },
+    xAxis: {
+      type: 'datetime',
+      dateTimeLabelFormats: { second: '%H:%M:%S' }
+    },
+    yAxis: {
+      title: { text: 'Thrust (Newtons)' }
+      //title: { text: 'Temperature (Fahrenheit)' }
+    },
+    credits: { enabled: false }
+  });
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        var x = (new Date()).getTime(),
+          y = parseFloat(this.responseText);
+        //console.log(this.responseText);
+        if (chartT.series[0].data.length > 40) {
+          chartT.series[0].addPoint([x, y], true, true, true);
+        } else {
+          chartT.series[0].addPoint([x, y], true, false, true);
+        }
+      }
+    };
+    xhttp.open("GET", "/temperature", true);
+    xhttp.send();
+  }, 300);
+
+</script>
+
+</html>
